@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <meta name="description" content="Prototipo demostrativo del sistema de inventario de una tienda.">
+  <title>Inventario Tienda · Resumen</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegación principal">
+      <a class="brand" href="#resumen" aria-label="Inventario Tienda, ir al resumen" data-view="overview">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-copy"><strong>tienda</strong><small>control de inventario</small></span>
+      </a>
+
+      <div class="sidebar-label">GESTIÓN</div>
+      <nav class="nav-list">
+        <button class="nav-item is-active" type="button" data-view="overview" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="4" rx="1.5"></rect><rect x="13.5" y="10.5" width="7" height="10" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
+          <span>Resumen</span>
+        </button>
+        <button class="nav-item" type="button" data-view="products">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"></path><path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.2V21"></path></svg>
+          <span>Productos</span>
+          <span class="nav-count" id="navProductCount">0</span>
+        </button>
+        <button class="nav-item" type="button" data-view="movements">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h13M15 4l3 3-3 3M19 17H6m3-3-3 3 3 3"></path></svg>
+          <span>Movimientos</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <section class="sidebar-note" aria-label="Alcance del prototipo">
+        <span class="note-icon" aria-hidden="true">i</span>
+        <div><strong>Modo demostración</strong><p>Los cambios se guardan en este navegador.</p></div>
+      </section>
+      <div class="sidebar-footer"><span class="status-dot"></span> Prototipo local <span class="version">v0.1</span></div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Inventario</span><span class="crumb-slash">/</span><strong id="breadcrumbCurrent">Resumen</strong></div>
+        <div class="topbar-actions">
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="view" id="view-overview" data-view-panel="overview">
+          <div class="page-heading">
+            <div><p class="eyebrow">OPERACIÓN DIARIA</p><h1>El inventario,<br><em>bajo control.</em></h1><p class="lead">Una vista clara de lo que hay, lo que se mueve y lo que necesita atención.</p></div>
+            <button class="button button-primary" type="button" data-action="add-product"><span class="plus">+</span> Nuevo producto</button>
+          </div>
+
+          <div class="metric-grid" aria-label="Indicadores del inventario">
+            <article class="metric-card metric-featured"><div class="metric-top"><span>Productos registrados</span><span class="metric-icon icon-box" aria-hidden="true">▱</span></div><div class="metric-value" id="metricProducts">0</div><div class="metric-foot"><span class="metric-dot"></span> Catálogo actual</div></article>
+            <article class="metric-card"><div class="metric-top"><span>Unidades disponibles</span><span class="metric-icon icon-units" aria-hidden="true">↗</span></div><div class="metric-value" id="metricUnits">0</div><div class="metric-foot">Sumatoria de existencias</div></article>
+            <article class="metric-card"><div class="metric-top"><span>Valor estimado</span><span class="metric-icon icon-value" aria-hidden="true">∑</span></div><div class="metric-value metric-price" id="metricValue">0,00</div><div class="metric-foot">Moneda por definir · precio × cantidad</div></article>
+            <article class="metric-card metric-alert"><div class="metric-top"><span>Stock bajo</span><span class="metric-icon icon-alert" aria-hidden="true">!</span></div><div class="metric-value" id="metricLow">0</div><div class="metric-foot">Umbral de demostración: 8 unidades</div></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel stock-panel">
+              <div class="panel-heading"><div><p class="eyebrow">EXISTENCIAS</p><h2>Productos en inventario</h2></div><button class="text-button" type="button" data-view="products">Ver catálogo <span aria-hidden="true">↗</span></button></div>
+              <div class="stock-list" id="stockList"></div>
+            </section>
+
+            <section class="panel attention-panel">
+              <div class="panel-heading"><div><p class="eyebrow">ATENCIÓN</p><h2>Necesitan revisión</h2></div><span class="attention-counter" id="attentionCount">0</span></div>
+              <p class="panel-copy">Productos con 8 unidades o menos. Revisa existencias antes de la próxima reposición.</p>
+              <div class="attention-list" id="attentionList"></div>
+              <button class="button button-outline full-button" type="button" data-view="products">Revisar productos</button>
+            </section>
+          </div>
+
+          <section class="panel recent-panel">
+            <div class="panel-heading"><div><p class="eyebrow">TRAZABILIDAD</p><h2>Movimientos recientes</h2></div><button class="text-button" type="button" data-view="movements">Ver movimientos <span aria-hidden="true">↗</span></button></div>
+            <div class="table-wrap"><table><thead><tr><th>PRODUCTO</th><th>TIPO</th><th>CANTIDAD</th><th>FECHA</th><th>RESPONSABLE</th></tr></thead><tbody id="recentMovements"></tbody></table></div>
+          </section>
+          <p class="prototype-footnote">Prototipo educativo · Información ficticia · Sin conexión a base de datos</p>
+        </section>
+
+        <section class="view" id="view-products" data-view-panel="products" hidden>
+          <div class="page-heading compact-heading">
+            <div><p class="eyebrow">CATÁLOGO</p><h1>Productos</h1><p class="lead">Consulta y actualiza las existencias del catálogo.</p></div>
+            <button class="button button-primary" type="button" data-action="add-product"><span class="plus">+</span> Nuevo producto</button>
+          </div>
+          <section class="panel catalog-panel">
+            <div class="catalog-toolbar"><div><h2>Catálogo de productos</h2><p><span id="catalogCount">0</span> registros · ordenados por nombre</p></div><div class="catalog-controls">
+              <label class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg><span class="sr-only">Buscar producto</span><input id="productSearch" type="search" placeholder="Buscar producto…" autocomplete="off"></label>
+              <label class="filter-select"><span class="sr-only">Filtrar existencias</span><select id="stockFilter"><option value="all">Todos</option><option value="low">Stock bajo</option><option value="ok">Stock suficiente</option></select></label>
+            </div></div>
+            <div class="table-wrap"><table class="products-table"><thead><tr><th>PRODUCTO</th><th>PRECIO UNITARIO</th><th>EXISTENCIAS</th><th>ESTADO</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody id="productsTable"></tbody></table></div>
+            <div class="empty-state" id="emptyProducts" hidden><span class="empty-mark">⌕</span><strong>No encontramos productos</strong><p>Prueba otra búsqueda o cambia el filtro.</p></div>
+          </section>
+          <p class="prototype-footnote">Los cambios de este prototipo se guardan localmente en el navegador.</p>
+        </section>
+
+        <section class="view" id="view-movements" data-view-panel="movements" hidden>
+          <div class="page-heading compact-heading">
+            <div><p class="eyebrow">KARDEX DE MUESTRA</p><h1>Movimientos</h1><p class="lead">Entradas y salidas para mostrar cómo cambiarían las existencias.</p></div>
+            <button class="button button-primary" type="button" data-action="add-movement"><span class="plus">+</span> Registrar movimiento</button>
+          </div>
+          <section class="panel movement-summary">
+            <div class="movement-intro"><span class="movement-symbol" aria-hidden="true">↔</span><div><p class="eyebrow">REGISTRO DE OPERACIONES</p><h2>Un historial sencillo y legible</h2><p>Registra una entrada o salida. El prototipo actualiza las unidades del producto en el navegador.</p></div></div>
+            <div class="movement-totals"><div><span>Movimientos</span><strong id="movementCount">0</strong></div><div><span>Entradas</span><strong class="positive" id="entryCount">0</strong></div><div><span>Salidas</span><strong class="negative" id="exitCount">0</strong></div></div>
+          </section>
+          <section class="panel movement-panel">
+            <div class="panel-heading"><div><p class="eyebrow">ACTIVIDAD</p><h2>Historial de movimientos</h2></div><span class="demo-tag">DEMO</span></div>
+            <div class="table-wrap"><table><thead><tr><th>PRODUCTO</th><th>TIPO</th><th>CANTIDAD</th><th>FECHA Y HORA</th><th>NOTA</th></tr></thead><tbody id="movementTable"></tbody></table></div>
+            <div class="empty-state" id="emptyMovements" hidden><span class="empty-mark">↔</span><strong>Aún no hay movimientos</strong><p>Registra una entrada o salida para comenzar.</p></div>
+          </section>
+          <p class="prototype-footnote">Historial ilustrativo. Las cantidades iniciales son una fotografía independiente de demostración.</p>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog class="dialog" id="productDialog" aria-labelledby="productDialogTitle">
+    <form id="productForm" class="dialog-form">
+      <div class="dialog-heading"><div><p class="eyebrow">CATÁLOGO</p><h2 id="productDialogTitle">Nuevo producto</h2></div><button class="icon-button" type="button" data-close="productDialog" aria-label="Cerrar">×</button></div>
+      <input id="productId" type="hidden">
+      <label class="field">Nombre del producto<input id="productName" name="name" required maxlength="70" placeholder="Ej. Mouse inalámbrico"></label>
+      <div class="field-row"><label class="field">Precio unitario<input id="productPrice" name="price" type="number" required min="0" step="0.01" inputmode="decimal" placeholder="0.00"></label><label class="field">Existencias<input id="productQuantity" name="quantity" type="number" required min="0" step="1" inputmode="numeric" placeholder="0"></label></div>
+      <p class="form-hint">El prototipo no define moneda ni se conecta a la base de datos.</p>
+      <div class="dialog-actions"><button class="button button-outline" type="button" data-close="productDialog">Cancelar</button><button class="button button-primary" type="submit">Guardar producto</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="movementDialog" aria-labelledby="movementDialogTitle">
+    <form id="movementForm" class="dialog-form">
+      <div class="dialog-heading"><div><p class="eyebrow">KARDEX</p><h2 id="movementDialogTitle">Registrar movimiento</h2></div><button class="icon-button" type="button" data-close="movementDialog" aria-label="Cerrar">×</button></div>
+      <label class="field">Producto<select id="movementProduct" name="product" required></select></label>
+      <div class="field-row"><label class="field">Tipo de movimiento<select id="movementType" name="type"><option value="entrada">Entrada</option><option value="salida">Salida</option></select></label><label class="field">Cantidad<input id="movementQuantity" name="quantity" type="number" required min="1" step="1" inputmode="numeric" placeholder="1"></label></div>
+      <label class="field">Nota breve<input id="movementNote" name="note" maxlength="80" placeholder="Ej. Reposición de proveedor"></label>
+      <p class="form-hint">Una salida no puede superar las existencias actuales.</p>
+      <div class="dialog-actions"><button class="button button-outline" type="button" data-close="movementDialog">Cancelar</button><button class="button button-primary" type="submit">Aplicar movimiento</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
